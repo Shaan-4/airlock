@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: airlock
+    runtime: docker
+    plan: free
+    region: singapore
+    healthCheckPath: /healthz
