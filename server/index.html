@@ -50,10 +50,10 @@ a{color:var(--trust)}
 <body>
 <main>
   <h1>Airlock</h1>
-  <p class="lead">A firewall for AI agents against prompt injection. Pick a task and plant an attack in the
-    email, web page or calendar invite it reads. The same deliberately gullible model drives all three agents:
-    it does the task correctly <i>and</i> obeys every injected instruction. Only the architecture around it differs.
-    <a href="https://github.com/Shaan-4/airlock">Source</a></p>
+  <p class="lead">A prompt-injection defense for AI agents that use tools. Choose a task, then choose an attack
+    to hide in the email, web page or calendar event that the task reads. All three agents use the same scripted
+    model, which does the task correctly but also follows any instruction hidden in the content. The only
+    difference is how each agent is built. <a href="https://github.com/Shaan-4/airlock">Source on GitHub</a></p>
 
   <div class="controls">
     <div><label for="task">Task</label><select id="task"></select></div>
@@ -64,17 +64,18 @@ a{color:var(--trust)}
 
   <div class="cols" id="cols"></div>
 
-  <h2>Benchmark: every task × every applicable attack</h2>
+  <h2>Benchmark (all 9 tasks, every attack that applies)</h2>
   <div id="bench">Loading…</div>
-  <p class="note-sm">Worst-case model, so the undefended agent's attack success rate is an upper bound; real models
-    fall for injections some of the time. The one attack Airlock lets through, <code>poison_time</code>, forges a
-    meeting time inside the very email the user asked it to read: no provenance-based defense can tell those apart.</p>
+  <p class="note-sm">The scripted model follows every injected instruction, so the plain agent's 100% is a worst
+    case. Real models get fooled less often. The one attack Airlock lets through, <code>poison_time</code>, puts a fake
+    meeting time inside the email the user asked it to read, and tracking where data came from can't tell it apart
+    from the real time.</p>
 </main>
 <script>
 const DESC = {
-  "react": ["Undefended agent", "One model reads everything and picks every tool call."],
-  "react+taint": ["Agent + naive taint", "Same, but once untrusted text is read, all later arguments count as untrusted."],
-  "airlock": ["Airlock", "Planner sees only your request; quarantined model reads the untrusted data; policies check every call."]
+  "react": ["Plain agent", "One model reads everything and chooses each tool call."],
+  "react+taint": ["Plain agent + taint tracking", "Same, but after reading anything untrusted, all its later arguments count as untrusted."],
+  "airlock": ["Airlock", "The planner only sees your request, a separate model reads the untrusted content, and each call is checked."]
 };
 let S = null;
 const $ = id => document.getElementById(id);
@@ -94,11 +95,11 @@ function showPayload(){
   const p = $("payload");
   if (!a) { p.style.display = "none"; return; }
   p.style.display = "block";
-  p.innerHTML = `<b>Planted in the content this task reads:</b> “${esc(a.payload)}”`;
+  p.innerHTML = `<b>Hidden in the content this task reads:</b> “${esc(a.payload)}”`;
 }
 function renderEvent(e){
   if (e.kind === "plan") {
-    return `<div class="ev"><div class="head"><span class="kind">plan</span><span class="tool">${e.result.steps.length} steps, fixed before any data is read</span></div>
+    return `<div class="ev"><div class="head"><span class="kind">plan</span><span class="tool">${e.result.steps.length} steps, written before anything is read</span></div>
       <details><summary>show plan</summary><pre>${esc(JSON.stringify(e.result, null, 1))}</pre></details></div>`;
   }
   if (e.kind === "final") {
