@@ -6,7 +6,7 @@ The problem: if an agent can read your email and also send email, then anyone wh
 
 I wanted a defense that doesn't depend on the model behaving well, so I built one where the checks happen in ordinary code, and then measured how much it costs in terms of tasks the agent can still complete.
 
-Live demo: `<your-render-url>` (pick a task and an attack, and you can see three agents handle it side by side).
+Live demo: https://airlock-1ziz.onrender.com (pick a task and an attack, and you can see three agents handle it side by side).
 
 ![Demo: the same poisoned email handled by three agents](docs/demo.png)
 
